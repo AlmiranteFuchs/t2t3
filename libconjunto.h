@@ -79,7 +79,7 @@ conjunto_t * cria_diferenca (conjunto_t *c1, conjunto_t *c2);
 conjunto_t * cria_interseccao (conjunto_t *c1, conjunto_t *c2);
 
 /*
- * Cria e  o endereco do conjunto uniao entre os conjuntos c1 e c2.
+ * Cria e retorna o endereco do conjunto uniao entre os conjuntos c1 e c2.
  * Retorna NULL se a operacao falhou.
  */
 conjunto_t * cria_uniao (conjunto_t *c1, conjunto_t *c2);
@@ -130,3 +130,7 @@ int incrementar_iterador (conjunto_t *c, int *elemento);
  */
 int retirar_um_elemento (conjunto_t *c);
 
+
+int insere_ordenado(int *v, int final, int elemento);
+
+int busca_binaria_recursiva(int *vector, int begin, int end, int elemento);

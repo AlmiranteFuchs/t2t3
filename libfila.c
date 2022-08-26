@@ -1,13 +1,13 @@
 #include <stdlib.h>
 #include "libfila.h"
 
-/* !# PROTOTYPES #! */
+/*PROTOTYPES #! */
 nodo_f_t *cria_nodo(int chave);
 int retira_fila (fila_t* f, int* elemento);
 
 
 /*
- *  !# Cria uma fila vazia e a retorna, se falhar retorna NULL. #!
+ * Cria uma fila vazia e a retorna, se falhar retorna NULL. #!
 */
 fila_t* cria_fila ()
 {
@@ -31,8 +31,9 @@ fila_t* cria_fila ()
     return f;
 }
 
+
 /*
- *  !# Remove todos os elementos da fila, libera espaco e devolve NULL. #!
+ * Remove todos os elementos da fila, libera espaco e devolve NULL. #!
  */
 fila_t* destroi_fila (fila_t* f)
 {
@@ -50,8 +51,9 @@ fila_t* destroi_fila (fila_t* f)
     return NULL;
 }
 
+
 /*
- *  !# Retorna 1 se a fila esta vazia e 0 caso contrario. #!
+ * Retorna 1 se a fila esta vazia e 0 caso contrario. #!
  */
 int fila_vazia (fila_t* f)
 {
@@ -61,17 +63,19 @@ int fila_vazia (fila_t* f)
     return 0;
 }
 
+
 /*
- *  !# Retorna o tamanho da fila, isto eh, o numero de elementos presentes nela. #!
+ * Retorna o tamanho da fila, isto eh, o numero de elementos presentes nela. #!
  */
 int tamanho_fila (fila_t* f)
 {
     return f->tamanho;
 }
 
+
 /*
- *  !# Insere o elemento no final da fila (politica FIFO). #!
- *  !# Retorna 1 se a operacao foi bem sucedida e 0 caso contrario. #!
+ * Insere o elemento no final da fila (politica FIFO). #!
+ * Retorna 1 se a operacao foi bem sucedida e 0 caso contrario. #!
  */
 int insere_fila (fila_t* f, int elemento)
 {
@@ -88,9 +92,10 @@ int insere_fila (fila_t* f, int elemento)
     return 1;
 }
 
+
 /*
- *  !# Remove o elemento do inicio da fila (politica FIFO) e o retorna. #!
- *  !# Retorna 1 se a operacao foi bem sucedida e 0 caso contrario. #!
+ * Remove o elemento do inicio da fila (politica FIFO) e o retorna. #!
+ * Retorna 1 se a operacao foi bem sucedida e 0 caso contrario. #!
  */
 int retira_fila (fila_t* f, int* elemento)
 {
@@ -113,8 +118,9 @@ int retira_fila (fila_t* f, int* elemento)
     return 1;
 }
 
+
 /*
- *  !# Nodos #!
+ * Nodos #!
  */
 nodo_f_t *cria_nodo(int chave)
 {
