@@ -6,6 +6,9 @@
 
 /* Prototypes */
 int busca_binaria_recursiva(int *vector, int begin, int end, int elemento);
+int desloca_vetor(int* v, int inicio, int final);
+int troca_elementos(int *v, int ind_x, int ind_a);
+int insere_ordenado(int *v, int final, int elemento);
 
 /*
  *  Cria um conjunto vazio e o retorna, se falhar retorna NULL.
@@ -100,7 +103,7 @@ int insere_conjunto (conjunto_t *c, int elemento){
 
 int retira_conjunto (conjunto_t *c, int elemento){
     int indice_elem;
-    if (indice_elem = busca_binaria_recursiva(c->v, 0, c->card - 1, elemento) != -1)
+    if ((indice_elem = busca_binaria_recursiva(c->v, 0, c->card - 1, elemento)) != -1)
     {
         /* Caso ele exista */
         int aux = c->v[indice_elem];
@@ -224,7 +227,7 @@ conjunto_t * cria_uniao (conjunto_t *c1, conjunto_t *c2){
     for (i = 0; i < c2->card; i++)
         insere_conjunto(c_uniao, c2->v[i]);
 
-    return 1;
+    return c_uniao;
 }
 
 /*
@@ -232,7 +235,7 @@ conjunto_t * cria_uniao (conjunto_t *c1, conjunto_t *c2){
  */
 conjunto_t * cria_copia (conjunto_t *c){
     conjunto_t *c_copia;
-    if (c_copia = cria_conjunto(c->max))
+    if ((c_copia = cria_conjunto(c->max)))
     {   
         int i;
         for (i = 0; i < c->card; i++)
@@ -271,7 +274,6 @@ conjunto_t * cria_subconjunto (conjunto_t *c, int n){
         int indice_aleatorio = rand() % c->card;
         c_aleatorio->v[i] = c->v[indice_aleatorio];
     }
-
     return c_aleatorio;
 
 }
@@ -283,7 +285,7 @@ conjunto_t * cria_subconjunto (conjunto_t *c, int n){
 void imprime (conjunto_t *c){
     int i;
     for (i = 0; i < c->card; i++)
-        printf("%d", c->v[i]);
+        printf("%d\n", c->v[i]);
 
 }
 
@@ -291,15 +293,10 @@ void imprime (conjunto_t *c){
  * Retorna 1 se conseguiu dobrar o tamanho max do conjunto e 0 caso contrario.
  */
 int redimensiona (conjunto_t *c){
-    int *aux;
-    if (!(aux = malloc(sizeof(int) * (c->max * 2))))
+    /* Copia os valores para novo aloc, libera o espaço e recebe o novo alocamento */
+    if (!(c->v = realloc(c->v, sizeof(int) * (c->max * 2))))
         return 0;
 
-    /* Copia os valores para novo aloc, libera o espaço e recebe o novo alocamento */
-    memcpy(aux, c->v, sizeof(c->v));
-    free(c->v);
-    c->v = aux;
-    free(aux);
     return 1;
 }
 
@@ -316,7 +313,7 @@ int incrementar_iterador (conjunto_t *c, int *elemento){
         c->ptr++;
 
         /* Redutante? retorno e ponteiro para elemento apontado ;x */
-        elemento = c->v[c->ptr];
+        /*elemento = c->v[c->ptr];*/
         return c->v[c->ptr];
     }
     return 0;
@@ -333,14 +330,13 @@ int retirar_um_elemento (conjunto_t *c){
 
     int indice_aleatorio = rand() % c->card;
 
-    int aux = c->v[indice_aleatorio];
     c->v[indice_aleatorio] = 0;
     c->card--;
 
     /* Pra manter a estrutura ordenada, desloca vetor */
     desloca_vetor(c->v, indice_aleatorio, c->card);
 
-    return;
+    return indice_aleatorio;
 }
 
 /*
@@ -379,10 +375,10 @@ int busca_binaria_recursiva(int *vector, int begin, int end, int elemento){
  *  Troca os indíces de x e a
  */
 int troca_elementos(int *v, int ind_x, int ind_a){
-    int aux = v[ind_x];
-    v[ind_x] = v[ind_a];
-    v[ind_a] = aux;
-    return 0;
+    int aux = *(v + ind_x);
+    *(v + ind_x) = *(v + ind_a);
+    *(v + ind_a) = aux;
+    return 1;
 }
 
 /*
@@ -403,9 +399,9 @@ int insere_ordenado(int *v, int final, int elemento){
 int desloca_vetor(int* v, int inicio, int final){
     while (inicio < final)
     {
-        troca_elementos(v, v[inicio], v[inicio + 1]);
+        troca_elementos(v, inicio, inicio + 1);
         inicio++;
     }
-    
+    return 1;
 }
 
