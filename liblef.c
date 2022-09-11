@@ -55,7 +55,7 @@ lef_t *destroi_lef(lef_t *l)
  */
 int adiciona_inicio_lef(lef_t *l, evento_t *evento)
 {
-    if ((memcopy(l->Primeiro->evento, evento, sizeof(evento_t))))
+    if ((memcpy(l->Primeiro->evento, evento, sizeof(evento_t))))
     {
         return 1;
     }
@@ -85,7 +85,7 @@ int adiciona_ordem_lef(lef_t *l, evento_t *evento)
             local->prox = novo;
 
             /* Copia o evento para o novo nodo */
-            if ((memcopy(novo->evento, evento, sizeof(evento_t))))
+            if ((memcpy(novo->evento, evento, sizeof(evento_t))))
             {
                 return 1;
             }
