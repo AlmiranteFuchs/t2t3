@@ -61,7 +61,7 @@ typedef struct coordenada
 mundo_t *cria_mundo(int nro_pessoas, int nro_locais, int nro_rumores, int max_x, int max_y);
 
 /* Destroi mundo */
-mundo_t *destroi_mundo(mundo_t *m);
+void destroi_mundo(mundo_t *m);
 
 /* Cria pessoa */
 pessoa_t *cria_pessoa(int id_pessoa, int extroversao, int paciencia, int idade);
@@ -98,3 +98,6 @@ int adiciona_rumor(mundo_t *m, rumor_t *r);
 
 /* Adiciona rumor a pessoa */
 int adiciona_rumor_pessoa(pessoa_t *p, rumor_t *r);
+
+/* Procura local a partir de id_local */
+local_t *procura_local(mundo_t *m, int id_local);

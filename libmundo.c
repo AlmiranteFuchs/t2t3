@@ -74,3 +74,28 @@ mundo_t *cria_mundo(int nro_pessoas, int nro_locais, int nro_rumores, int max_x,
 
     return m;
 }
+
+void destroi_mundo(mundo_t *m)
+{
+    int i;
+    for (i = 0; i < m->nro_pessoas; i++)
+    {
+        destroi_conjunto(m->pessoas[i].rumores);
+    }
+    for (i = 0; i < m->nro_locais; i++)
+    {
+        destroi_fila(m->locais[i].fila);
+    }
+    free(m->pessoas);
+    free(m->locais);
+    free(m->rumores);
+    free(m);
+}
+
+
+
+void imprime_mundo(mundo_t *m)
+{
+    int i;
+    printf("Tempo atual: %d)\n", m->tempo_atual);
+}

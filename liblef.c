@@ -102,7 +102,9 @@ int adiciona_ordem_lef(lef_t *l, evento_t *evento)
  */
 evento_t *obtem_primeiro_lef(lef_t *l) { return l->Primeiro->evento; }
 
-/* Funcoes Auxiliares  */
+/*
+ * ---------------------- Funcoes auxiliares ----------------------
+ */
 
 nodo_lef_t *cria_nodo_lef()
 {
@@ -123,4 +125,56 @@ void destroi_nodo_lef(nodo_lef_t *nodo)
         nodo->evento->destroidados(nodo->evento->dados);
     free(nodo->evento);
     free(nodo);
+}
+
+/*
+ * ---------------------- Tipos de eventos ----------------------
+ */
+
+/* Enum tipos de eventos*/
+typedef enum
+{
+    CHEGADA,
+    PARTIDA,
+    FIM_SIMULACAO
+} tipo_evento_t;
+
+/*
+ * Evento chegada
+ * Representa um id_pessoa chegando em id_local
+ * Ao chegar, uma pessoa deve saber se o local está ou não lotado, decidir esperar na ela ou sair imediatamente. Caso a pessoa entre no local esta deve decidir
+ * seu tempo de permanência e escalonar sua saída.
+ */
+
+typedef struct chegada
+{
+    int id_pessoa;
+    int id_local;
+} chegada_t;
+
+evento_t *cria_evento_chegada(int id_pessoa, int id_local, int tempo)
+{
+
+    /* Checar se local está lotado */
+    
+
+    evento_t *evento;
+    if (!(evento = malloc(sizeof(evento_t))))
+        return NULL;
+
+    evento->tipo = CHEGADA;
+    evento->tempo = tempo;
+    if (!(evento->dados = malloc(sizeof(chegada_t))))
+        return NULL;
+    chegada_t *dados = evento->dados;
+    dados->id_pessoa = id_pessoa;
+    dados->id_local = id_local;
+    evento->destroidados = destroi_chegada;
+
+    return evento;
+}
+
+void destroi_chegada(void *dados)
+{
+    free(dados);
 }
