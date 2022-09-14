@@ -1,10 +1,5 @@
 #include <stdlib.h>
 #include "libmundo.h"
-#include "libfila.h"
-#include "libconjunto.h"
-#include "libaleat.h"
-#include "libeventos.h"
-#include "liblef.h"
 
 mundo_t *cria_mundo(int nro_pessoas, int nro_locais, int nro_rumores, int max_x, int max_y, lef_t* lef)
 {

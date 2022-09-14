@@ -6,7 +6,6 @@
  */
 #include "libconjunto.h"
 #include "libfila.h"
-#include "liblef.h"
 
 /* Define uma pessoa */
 typedef struct pessoa
@@ -18,22 +17,23 @@ typedef struct pessoa
     conjunto_t *rumores; /* Conjunto de rumores que a pessoa conhece */
 } pessoa_t;
 
-/* Define um local */
-typedef struct local
-{
-    int id_local;             /* Id do local */
-    int capacidade;           /* Capacidade máxima de pessoas no local */
-    conjunto_t *pessoas;      /* Conjunto de pessoas no local */
-    fila_t *fila;             /* Fila de pessoas no local */
-    coordenada_t localizacao; /* Localização do local no mundo */
-} local_t;
-
 /* Define uma coordenada */
 typedef struct coordenada
 {
     int x; /* Coordenada x */
     int y; /* Coordenada y */
 } coordenada_t;
+
+/* Define um local */
+typedef struct local
+{
+    int id_local;             /* Id do local */
+    int capacidade;           /* Capacidade máxima de pessoas no local */
+    conjunto_t *pessoa_t;     /* Conjunto de pessoas no local */
+    fila_t *pessoa_t;         /* Fila de pessoas no local */
+    coordenada_t localizacao; /* Localização do local no mundo */
+} local_t;
+
 
 /* Define um mundo */
 typedef struct mundo
@@ -53,10 +53,7 @@ typedef struct mundo
  */
 
 mundo_t *cria_mundo(int nro_pessoas, int nro_locais, int nro_rumores, int max_x, int max_y, lef_t *lef); /* Cria mundo */
-local_t *procura_local(int id_local, local_t *locais);                                                   /* Procura local a partir de id_local */
-pessoa_t *procura_pessoa(int id_pessoa, pessoa_t *pessoas);                                              /* Procura pessoa a partir de id_pessoa */
 void destroi_mundo(mundo_t *m);                                                                          /* Destroi mundo */
-int local_cheio(local_t *local);                                                                         /* Checa se local está cheio */
 
 /* Informações do mundo */
 void imprime_mundo(mundo_t *m);         /* Imprime mundo */

@@ -195,8 +195,10 @@ evento_t *cria_evento_chegada(int id_pessoa, int id_local, int tempo)
     dados->id_pessoa = id_pessoa;
     dados->id_local = id_local;
 
-    evento->dados = dados;
-    evento->destroidados = destroi_evento_chegada;
+    /*evento->destroidados = destroi_evento_chegada;*/
+
+    memcpy(evento->dados, dados, sizeof(dados));
+    memcpy(evento->destroidados, destroi_evento_chegada, sizeof(destroi_evento_chegada));
 
     return evento;
 }

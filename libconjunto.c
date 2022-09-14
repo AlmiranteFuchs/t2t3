@@ -113,6 +113,8 @@ int retira_conjunto(conjunto_t *c, int elemento)
         int aux = c->v[indice_elem];
         c->v[indice_elem] = 0;
         c->card--;
+
+        desloca_vetor(c->v, indice_elem, c->card);
         return aux;
     }
     return 0;
@@ -224,17 +226,20 @@ conjunto_t *cria_uniao(conjunto_t *c1, conjunto_t *c2)
 {
     /* Tenta criar um conjunto do tamanho dos dois somado*/
     conjunto_t *c_uniao;
-    if (!(cria_conjunto(c1->max + c2->max)))
+    if (!(c_uniao = cria_conjunto(c1->max + c2->max)))
         return NULL;
 
     /* União --> Conjunto com todos os elementos de a e b */
     /* Empurra para c_uniao todos os elementos de c1 e c2, réplicas são tratadas no insere */
     int i;
     for (i = 0; i < c1->card; i++)
+    {
         insere_conjunto(c_uniao, c1->v[i]);
+    }
 
-    for (i = 0; i < c2->card; i++)
+    for (i = 0; i < c2->card; i++){
         insere_conjunto(c_uniao, c2->v[i]);
+    }
 
     return c_uniao;
 }
@@ -283,7 +288,7 @@ conjunto_t *cria_subconjunto(conjunto_t *c, int n)
     for (i = 0; i < n; i++)
     {
         int indice_aleatorio = rand() % c->card;
-        c_aleatorio->v[i] = c->v[indice_aleatorio];
+        insere_conjunto(c_aleatorio, c->v[indice_aleatorio]);
     }
     return c_aleatorio;
 }
@@ -330,11 +335,11 @@ int incrementar_iterador(conjunto_t *c, int *elemento)
 {
     if (c->ptr < c->card)
     {
-        c->ptr++;
 
         /* Redutante? retorno e ponteiro para elemento apontado ;x */
-        /*elemento = c->v[c->ptr];*/
-        return c->v[c->ptr];
+        *elemento = c->v[c->ptr];
+        c->ptr++;
+        return 1;
     }
     return 0;
 }
@@ -349,15 +354,20 @@ int retirar_um_elemento(conjunto_t *c)
     time_t t;
     srand((unsigned)time(&t));
 
-    int indice_aleatorio = rand() % c->card;
-
+    /* Gera um indice aleatorio */
+    int min_number = 0;
+    int max_number = c->card - 1;
+    int indice_aleatorio = rand() % (max_number + 1 - min_number) + min_number;
+    
+    int aux = c->v[indice_aleatorio];
+    
     c->v[indice_aleatorio] = 0;
     c->card--;
 
     /* Pra manter a estrutura ordenada, desloca vetor */
     desloca_vetor(c->v, indice_aleatorio, c->card);
 
-    return indice_aleatorio;
+    return aux;
 }
 
 /*
