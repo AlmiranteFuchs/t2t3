@@ -6,10 +6,10 @@ LDFLAGS = -lm
 CC = gcc
 
 # arquivos-objeto
-	objects = mundo.o libconjunto.o libfila.o libaleat.o libeventos.o
+	objects = mundo.o libconjunto.o libfila.o libaleat.o liblef.o libeventos.o
      
-all: mundo.o libconjunto.o  liblef.o libfila.o libaleat.o libeventos.o
-	$(CC) -o mundo mundo.o libconjunto.o  liblef.o libfila.o libaleat.o libeventos.o $(LDFLAGS)
+all: mundo.o libconjunto.o libfila.o libaleat.o liblef.o libeventos.o
+	$(CC) -o mundo mundo.o libconjunto.o libfila.o libaleat.o liblef.o libeventos.o $(LDFLAGS)
 
 libconjunto.o: libconjunto.c
 	$(CC) -c $(CFLAGS) libconjunto.c

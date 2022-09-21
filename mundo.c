@@ -8,26 +8,34 @@
 int main()
 {
     start_seed(); /* Inicializa SEED */
+   
 
     /* Cria uma lef pra guardar os eventos */
     lef_t *lef = cria_lef();
-
     /* Cria um evento do fim da simulação */
     evento_t *evento_fim;
     if (!(evento_fim = cria_evento_fim_simulacao(34944)))
         return 0;
 
+
     /* Insere na lef */
     if (!(adiciona_inicio_lef(lef, evento_fim)))
         return 0;
 
+
     mundo_t* mundo;
-    if (!(mundo = cria_mundo(20000, 30, 100, 8, lef)))
+    if ((mundo = cria_mundo(20000, 30, 100, 8, lef)))
         return 0;
+    
+    printf("\nFUCK\n");
+
+    printf("Alguma coisa");
 
     evento_t *evento_atual;
     while ((evento_atual = obtem_primeiro_lef(lef)))
     {
+        printf("Novo evento");
+
         mundo->tempo_atual = evento_atual->tempo;
         switch (evento_atual->tipo)
         {
