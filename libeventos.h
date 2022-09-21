@@ -10,8 +10,12 @@
  *  Diz respeito sobre definições de comportamento de eventos, suas criações e operações pois o liblef.h é intocável ;'(
  * ######################################################################################################################
  */
+#ifndef EVENTOS_H
+#define EVENTOS_H
 
 #include "liblef.h"
+#include "libconjunto.h"
+#include "entidades.h"
 
 typedef enum /* Enum tipos de eventos*/
 {
@@ -44,10 +48,6 @@ typedef struct disseminacao
     int id_local;
 } disseminacao_t;
 
-typedef struct fim_simulacao
-{
-    int tempo;
-} fim_simulacao_t;
 
 /*
  *  Operações de eventos
@@ -71,3 +71,11 @@ evento_t *cria_evento_chegada(int id_pessoa, int id_local, int tempo);          
 evento_t *cria_evento_partida(int id_pessoa, int id_local, int tempo);                              /* Cria evento de partida */
 evento_t *cria_evento_disseminacao(int id_pessoa, int id_local, conjunto_t *cj_rumores, int tempo); /* Cria evento de disseminação */
 evento_t *cria_evento_fim_simulacao(int tempo);                                                     /* Cria evento de fim de simulação */
+
+/*
+ *  Funções auxiliares de entidades
+ */
+mundo_t *cria_mundo(int n_tamanho, int n_rumores, int n_pessoas, int n_locais, lef_t *lef);
+void destroi_mundo(mundo_t *mundo);
+int local_cheio(local_t *local);
+#endif

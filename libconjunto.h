@@ -9,6 +9,10 @@
  * Versao 1.0.1 de 16/08/2022
  */
 
+#ifndef CONJUNTO_H
+#define CONJUNTO_H
+
+
 struct conjunto {
     int max;    /* tamanho maximo do vetor atualmente alocado     */
     int card;   /* cardinalidade, isto eh, tamanho usado ate max  */
@@ -134,3 +138,5 @@ int retirar_um_elemento (conjunto_t *c);
 int insere_ordenado(int *v, int final, int elemento);
 
 int busca_binaria_recursiva(int *vector, int begin, int end, int elemento);
+
+#endif

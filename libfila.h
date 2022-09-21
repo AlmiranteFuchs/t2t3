@@ -9,6 +9,8 @@
  * Versao 1.0.0 de 10/11/2021
  * Versao 1.0.1 de 08/2022
  */
+#ifndef FILA_H
+#define FILA_H
 
 struct nodo_f {
     int chave;          /* lista de numeros inteiros               */
@@ -62,4 +64,6 @@ int retira_fila (fila_t *f, int *elemento);
  * Este ponteiro pode ser inicializado e incrementado, viabilizando
  * a implementacao de um mecanismo iterador.
  */
+
+#endif
 

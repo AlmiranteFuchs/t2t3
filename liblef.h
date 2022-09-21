@@ -16,6 +16,10 @@
  * evento_t possui membros comuns a todos eventos e um membro
  * dados para armazenar as estruturas especificas de cada evento 
  */
+
+#ifndef LEF_H
+#define LEF_H
+
 typedef  struct evento {
     int tempo;   /* tempo logico do evento */
     int tipo;    /* inteiro para diferenciar os diferentes tipos de evento */
@@ -73,3 +77,4 @@ int adiciona_ordem_lef  (lef_t *l, evento_t *evento);
  */
 evento_t * obtem_primeiro_lef (lef_t *l);
 
+#endif

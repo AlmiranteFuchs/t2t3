@@ -7,4 +7,4 @@
 /* Calcula um número aleatório entre x e y */
 int aleat(int x, int y);
 /* Gera seed para rand */
-int start_seed();
+void start_seed();

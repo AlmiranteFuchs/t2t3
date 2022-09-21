@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "libmundo.h"
+#include "liblef.h"
 
 mundo_t *cria_mundo(int nro_pessoas, int nro_locais, int nro_rumores, int max_x, int max_y, lef_t* lef)
 {
@@ -56,7 +57,7 @@ mundo_t *cria_mundo(int nro_pessoas, int nro_locais, int nro_rumores, int max_x,
     for (i = 0; i < nro_locais; i++)
     {
         m->locais[i].id_local = i;
-        m->locais[i].capacidade = aleat(5, 30); /* FIXME: Capacidade máxima é oq??? */
+        m->locais[i].capacidade = aleat(5, 30);
         m->locais[i].localizacao.x = aleat(0, max_x);
         m->locais[i].localizacao.y = aleat(0, max_y);
         m->locais[i].pessoas = cria_conjunto(nro_pessoas);

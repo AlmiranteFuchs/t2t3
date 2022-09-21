@@ -1,10 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "liblef.h"
-#include "libmundo.h"
-#include "libfila.h"
 #include "libaleat.h"
+#include "liblef.h"
+#include "entidades.h"
 
 /* # Lista de futuros eventos# */
 
@@ -24,14 +23,7 @@ lef_t *cria_lef()
     if (!(lef = malloc(sizeof(lef_t))))
         return NULL;
 
-    nodo_lef_t *novo;
-    if (!(novo = cria_nodo_lef()))
-    {
-        free(lef);
-        return NULL;
-    }
-
-    lef->Primeiro = novo;
+    lef->Primeiro = NULL;
 
     return lef;
 }
@@ -62,26 +54,43 @@ lef_t *destroi_lef(lef_t *l)
  */
 int adiciona_inicio_lef(lef_t *l, evento_t *evento)
 {
-    /* Se já existe evento empurre ele pra cima */
-    if (l->Primeiro->evento != NULL)
-    {
-        nodo_lef_t *novo;
-        if (!(novo = cria_nodo_lef()))
-            return 0;
+    nodo_lef_t *novo;
+    evento_t *novo_evento;
+    
+    /* Aloca espaço para evento */
+    if (!(novo_evento = (evento_t *)malloc(sizeof(evento_t))))
+        return 0;
+    
+    /* Preenche evento */
+    novo_evento->tempo = evento->tempo;
+    novo_evento->tipo = evento->tipo;
+    novo_evento->dados = evento->dados;
+    novo_evento->tamanho = evento->tamanho;
+    novo_evento->dados = malloc(evento->tamanho);
 
+    /* Copia */
+    memcpy(novo_evento->dados, evento->dados, evento->tamanho);
+
+    /* Cria um nodo */
+    if (!(novo = cria_nodo_lef()))
+        return 0;
+
+    /* Preenche nodo */
+    novo->evento = novo_evento;
+    novo->prox = NULL;
+
+    /* Se não for o primeiro nodo */
+    if (l->Primeiro != NULL)
+    {
         novo->prox = l->Primeiro;
         l->Primeiro = novo;
-
-        memcpy(l->Primeiro->evento, evento, sizeof(evento_t));
-
-        return 1;
     }
-
-    if ((memcpy(l->Primeiro->evento, evento, sizeof(evento_t))))
+    else
     {
-        return 1;
+        l->Primeiro = novo;
     }
-    return 0;
+
+    return 1;
 }
 
 /*
@@ -91,41 +100,65 @@ int adiciona_inicio_lef(lef_t *l, evento_t *evento)
  */
 int adiciona_ordem_lef(lef_t *l, evento_t *evento)
 {
-    nodo_lef_t *local = l->Primeiro;
+    nodo_lef_t *nodo, *nodo_ante, *nodo_atual;
+    evento_t *novo_evento;
+    
+    if ((novo_evento = (evento_t*) malloc (sizeof(evento_t)))) {
+        novo_evento->tempo = evento->tempo;
+        novo_evento->tipo = evento->tipo;
+        novo_evento->tamanho = evento->tamanho;
+        novo_evento->dados = malloc (evento->tamanho);
+        memcpy (novo_evento->dados, evento->dados, evento->tamanho);
+    } else return 0;
 
-    if (l->Primeiro->prox == NULL)
-
-        while (local->prox != NULL)
-        {
-            if (local->prox->evento->tempo > evento->tempo)
-            {
-                /* Posição atual que é necessário inserir o novo nodo */
-                /* Troca os ponteiros dos nodos */
-                nodo_lef_t *novo;
-                if (!(novo = cria_nodo_lef()))
-                {
-                    return 0;
-                }
-                novo->prox = local->prox;
-                local->prox = novo;
-
-                /* Copia o evento para o novo nodo */
-                if ((memcpy(novo->evento, evento, sizeof(evento_t))))
-                {
-                    return 1;
-                }
-                return 0;
-            }
-            local = local->prox;
-        }
-    return 0;
+    if (!(nodo = malloc (sizeof (nodo_lef_t)))) return 0;
+    nodo_atual = l->Primeiro;
+    if (nodo_atual == NULL) {
+        free(novo_evento->dados);
+        free (novo_evento);
+        free(nodo);
+        adiciona_inicio_lef (l, evento);
+        return 0;
+    }
+    while (nodo_atual->prox != NULL && nodo_atual->evento->tempo < evento->tempo) {
+        nodo_ante = nodo_atual;
+        nodo_atual = nodo_atual->prox;
+    }
+    if (nodo_atual == l->Primeiro && nodo_atual->evento->tempo >= evento->tempo) {
+        free(novo_evento->dados);
+        free (novo_evento); 
+        free (nodo); 
+        adiciona_inicio_lef (l, evento);
+        return 0;
+    } else if (nodo_atual->prox == NULL) {
+        nodo->evento = novo_evento;
+        nodo_atual->prox = nodo;
+        nodo->prox = NULL;
+    } else { 
+        nodo->evento = novo_evento; 
+        nodo_ante->prox = nodo; 
+        nodo->prox = nodo_atual;
+    }
+    return 1;
 }
 
 /*
  * Retorna o primeiro evento da LEF. A responsabilidade por desalocar
  * a memoria associado eh de quem chama essa funcao
  */
-evento_t *obtem_primeiro_lef(lef_t *l) { return l->Primeiro->evento; }
+evento_t *obtem_primeiro_lef(lef_t *l) { 
+    nodo_lef_t *novo;
+    evento_t *evento;
+    
+    if (!l->Primeiro) return NULL;
+
+    evento = l->Primeiro->evento; 
+    novo = l->Primeiro;
+
+    l->Primeiro = l->Primeiro->prox;
+    free (novo);
+    return evento;
+ }
 
 /*
  * ####################

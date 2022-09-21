@@ -12,8 +12,8 @@ int aleat(x, y)
     return (rand() % (y - x + 1)) + x;
 }
 
-int start_seed()
+void start_seed()
 {
     srand(time(NULL));
-    return 0;
+    return;
 }
