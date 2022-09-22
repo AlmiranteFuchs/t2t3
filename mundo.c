@@ -8,7 +8,6 @@
 int main()
 {
     start_seed(); /* Inicializa SEED */
-   
 
     /* Cria uma lef pra guardar os eventos */
     lef_t *lef = cria_lef();
@@ -17,25 +16,23 @@ int main()
     if (!(evento_fim = cria_evento_fim_simulacao(34944)))
         return 0;
 
+    chegada_t *dados_chegada;           /* ponteiro que vai receber os dados de chegada */
+    saida_t *dados_saida;               /* ponteiro que vai receber os dados de saida */
+    disseminacao_t *dados_diss; /* ponteiro que vai receber os dados de disceminacao */
 
     /* Insere na lef */
     if (!(adiciona_inicio_lef(lef, evento_fim)))
         return 0;
 
-
-    mundo_t* mundo;
-    if ((mundo = cria_mundo(20000, 30, 100, 8, lef)))
+    mundo_t *mundo;
+    if (!(mundo = cria_mundo(20000, 30, 2, 8, lef)))
         return 0;
-    
-    printf("\nFUCK\n");
 
-    printf("Alguma coisa");
+
 
     evento_t *evento_atual;
     while ((evento_atual = obtem_primeiro_lef(lef)))
     {
-        printf("Novo evento");
-
         mundo->tempo_atual = evento_atual->tempo;
         switch (evento_atual->tipo)
         {
@@ -49,6 +46,7 @@ int main()
             break;
 
         case DISSEMINACAO:
+            printf("DISS");
             trata_evento_disseminacao(((disseminacao_t *)evento_atual->dados)->id_pessoa, ((disseminacao_t *)evento_atual->dados)->id_local, ((disseminacao_t *)evento_atual->dados)->rumores, mundo, lef);
             break;
 

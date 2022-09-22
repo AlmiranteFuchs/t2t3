@@ -103,43 +103,52 @@ int adiciona_ordem_lef(lef_t *l, evento_t *evento)
     nodo_lef_t *nodo, *nodo_ante, *nodo_atual;
     evento_t *novo_evento;
     
-    if ((novo_evento = (evento_t*) malloc (sizeof(evento_t)))) {
-        novo_evento->tempo = evento->tempo;
-        novo_evento->tipo = evento->tipo;
-        novo_evento->tamanho = evento->tamanho;
-        novo_evento->dados = malloc (evento->tamanho);
-        memcpy (novo_evento->dados, evento->dados, evento->tamanho);
-    } else return 0;
+    /* Aloca espaço para evento */
+    if (!(novo_evento = (evento_t *)malloc(sizeof(evento_t))))
+        return 0;
+    
+    /* Preenche evento */
+    novo_evento->tempo = evento->tempo;
+    novo_evento->tipo = evento->tipo;
+    novo_evento->tamanho = evento->tamanho;
+    novo_evento->dados = malloc(evento->tamanho);
 
-    if (!(nodo = malloc (sizeof (nodo_lef_t)))) return 0;
-    nodo_atual = l->Primeiro;
-    if (nodo_atual == NULL) {
-        free(novo_evento->dados);
-        free (novo_evento);
-        free(nodo);
-        adiciona_inicio_lef (l, evento);
+    memcpy(novo_evento->dados, evento->dados, evento->tamanho);
+
+    /* Cria um nodo */
+    if (!(nodo = cria_nodo_lef()))
         return 0;
+
+    /* Preenche nodo */
+    nodo->evento = novo_evento;
+    nodo->prox = NULL;
+
+    /* Se não for o primeiro nodo */
+    if (l->Primeiro != NULL)
+    {
+        nodo_ante = NULL;
+        nodo_atual = l->Primeiro;
+        while (nodo_atual != NULL && nodo_atual->evento->tempo < evento->tempo)
+        {
+            nodo_ante = nodo_atual;
+            nodo_atual = nodo_atual->prox;
+        }
+        if (nodo_ante == NULL)
+        {
+            nodo->prox = l->Primeiro;
+            l->Primeiro = nodo;
+        }
+        else
+        {
+            nodo->prox = nodo_atual;
+            nodo_ante->prox = nodo;
+        }
     }
-    while (nodo_atual->prox != NULL && nodo_atual->evento->tempo < evento->tempo) {
-        nodo_ante = nodo_atual;
-        nodo_atual = nodo_atual->prox;
+    else
+    {
+        l->Primeiro = nodo;
     }
-    if (nodo_atual == l->Primeiro && nodo_atual->evento->tempo >= evento->tempo) {
-        free(novo_evento->dados);
-        free (novo_evento); 
-        free (nodo); 
-        adiciona_inicio_lef (l, evento);
-        return 0;
-    } else if (nodo_atual->prox == NULL) {
-        nodo->evento = novo_evento;
-        nodo_atual->prox = nodo;
-        nodo->prox = NULL;
-    } else { 
-        nodo->evento = novo_evento; 
-        nodo_ante->prox = nodo; 
-        nodo->prox = nodo_atual;
-    }
-    return 1;
+
 }
 
 /*

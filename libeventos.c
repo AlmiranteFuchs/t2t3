@@ -4,8 +4,8 @@
 #include "libeventos.h"
 #include "libaleat.h"
 /*Prototype bc c is shit*/
-void saida_saida (mundo_t *mundo, pessoa_t * pessoa_saida, int pessoa_fila, local_t *local, int caso);
-void saida_chegada (mundo_t *mundo, pessoa_t *pessoa, local_t *local, int caso);
+void saida_saida(mundo_t *mundo, pessoa_t *pessoa_saida, int pessoa_fila, local_t *local, int caso);
+void saida_chegada(mundo_t *mundo, pessoa_t *pessoa, local_t *local, int caso);
 evento_t *cria_evento_fim_simulacao(int tempo);
 evento_t *cria_evento_disseminacao(int id_pessoa, int id_local, conjunto_t *cj_rumores_pessoa, int tempo);
 evento_t *cria_evento_partida(int id_pessoa, int id_local, int tempo);
@@ -21,7 +21,7 @@ void destroi_evento_fim_simulacao(evento_t *evento);
 /*stupid old compiler*/
 int max(int num1, int num2)
 {
-    return (num1 > num2 ) ? num1 : num2;
+    return (num1 > num2) ? num1 : num2;
 }
 
 /* Cria o mundo e inicializa suas entidades */
@@ -73,7 +73,7 @@ mundo_t *cria_mundo(int n_tamanho, int n_rumores, int n_pessoas, int n_locais, l
         insere_conjunto(m->rumores, i);
     }
 
-        /* Inicializa pessoas */
+    /* Inicializa pessoas */
     for (i = 0; i < n_pessoas; i++)
     {
         m->pessoas[i].id_pessoa = i;
@@ -94,19 +94,22 @@ mundo_t *cria_mundo(int n_tamanho, int n_rumores, int n_pessoas, int n_locais, l
         m->locais[i].fila_t = cria_fila();
     }
 
-
     /* Para cada pessoa */
     for (i = 0; i < n_pessoas; i++)
     {
         /* Escolhe um local aleatório */
         int local = aleat(0, n_locais - 1);
-        
+
         /* Evento de chegada */
         evento_t *evento_chegada;
-        
+
         /* Insere evento na lef */
-        if (!(evento_chegada = cria_evento_chegada(i, local, aleat(0, 96 * 7))))
+        int tempo_chegada = aleat(0, 96 * 7);
+        if (!(evento_chegada = cria_evento_chegada(i, local, tempo_chegada)))
+        {
+            printf("Não foi possível adicionar evento de chegada na lef.\n");
             return NULL;
+        }
 
         /* Insere na lef */
         if (!(adiciona_ordem_lef(lef, evento_chegada)))
@@ -153,6 +156,8 @@ int local_cheio(local_t *local)
 
 void trata_evento_chegada(int id_pessoa, int id_local, mundo_t *mundo, lef_t *lef)
 {
+    printf("\nTRATANDO evento de CHEGADA na lef para pessoa %d no tempo %d em local %d.\n", id_pessoa, mundo->tempo_atual, id_local);
+
     /* Procura local */
     local_t *local;
     if (!(local = &mundo->locais[id_local]))
@@ -210,28 +215,12 @@ void trata_evento_chegada(int id_pessoa, int id_local, mundo_t *mundo, lef_t *le
 
 void trata_evento_partida(int id_pessoa, int id_local, mundo_t *mundo, lef_t *lef)
 {
+    printf("\nTRATANDO evento de PARTIDA na lef para pessoa %d no tempo %d em local %d.\n", id_pessoa, mundo->tempo_atual, id_local);
+
     /* Procura local */
     local_t *local;
     if (!(local = &mundo->locais[id_local]))
         return;
-
-    if (!(fila_vazia(local->fila_t)))
-    {
-        /* Cria evento de chegada para id_pessoa na fila em id local */
-        int id_pessoa_fila;
-        if(!(retira_fila(local->fila_t, &id_pessoa_fila)))
-            return;
-
-        evento_t *evento_chegada;
-        if (!(evento_chegada = cria_evento_chegada(id_pessoa_fila, id_local, mundo->tempo_atual + 0)))
-            return;
-
-        /* Insere no inicio da lef */
-        if (!(adiciona_inicio_lef(lef, evento_chegada)))
-            return;
-
-        saida_saida(mundo, &mundo->pessoas[id_pessoa], id_pessoa_fila, local, 2);
-    }
 
     /* Cria evento de chegada para id_pessoa em outro local */
     int id_local_novo = aleat(0, mundo->nro_locais - 1);
@@ -253,12 +242,31 @@ void trata_evento_partida(int id_pessoa, int id_local, mundo_t *mundo, lef_t *le
 
     /* Cria evento de chegada */
     evento_t *evento_chegada;
-    if (!(evento_chegada = cria_evento_chegada(id_pessoa, id_local_novo, (mundo->tempo_atual + TDL) / 15)))
+    if (!(evento_chegada = cria_evento_chegada(id_pessoa, id_local_novo, mundo->tempo_atual + (TDL / 15))))
         return;
 
     /* Insere na lef */
     if (!(adiciona_ordem_lef(lef, evento_chegada)))
         return;
+
+    if (!(fila_vazia(local->fila_t)))
+    {
+        /* Cria evento de chegada para id_pessoa na fila em id local */
+        int id_pessoa_fila;
+        if (!(retira_fila(local->fila_t, &id_pessoa_fila)))
+            return;
+
+        evento_t *evento_chegada;
+        if (!(evento_chegada = cria_evento_chegada(id_pessoa_fila, id_local, mundo->tempo_atual + 0)))
+            return;
+
+        /* Insere no inicio da lef */
+        if (!(adiciona_inicio_lef(lef, evento_chegada)))
+            return;
+
+        saida_saida(mundo, &mundo->pessoas[id_pessoa], id_pessoa_fila, local, 2);
+        return;
+    }
 
     saida_saida(mundo, &mundo->pessoas[id_pessoa], -1, local, 1);
 }
@@ -275,29 +283,32 @@ void trata_evento_disseminacao(int id_pessoa, int id_local, conjunto_t *cj_rumor
     if (!(pessoa_origem = &mundo->pessoas[id_pessoa]))
         return;
 
-
     int i_rumor, i_pessoa, rumor, id_destinatario;
     iniciar_iterador(local->pessoa_t);
 
     printf("%6d:RUMOR Pessoa %4d Local %2d ", mundo->tempo_atual, pessoa_origem->id_pessoa, local->id_local);
     /* Para cada pessoa no local  */
-    iniciar_iterador (cj_rumores);
-    for (i_rumor = 0; i_rumor < cardinalidade (cj_rumores); i_rumor++) {
-        incrementar_iterador (cj_rumores, &rumor); 
-        iniciar_iterador (local->pessoa_t); 
-        for (i_pessoa = 0; i_pessoa < cardinalidade (local->pessoa_t); i_pessoa++) {
-            incrementar_iterador (local->pessoa_t, &id_destinatario);
-            if (aleat (0, 100) < mundo->pessoas[id_destinatario].extroversao)  
-                if (insere_conjunto (mundo->pessoas[id_destinatario].rumores, rumor))
+    iniciar_iterador(cj_rumores);
+    for (i_rumor = 0; i_rumor < cardinalidade(cj_rumores); i_rumor++)
+    {
+        incrementar_iterador(cj_rumores, &rumor);
+        iniciar_iterador(local->pessoa_t);
+        for (i_pessoa = 0; i_pessoa < cardinalidade(local->pessoa_t); i_pessoa++)
+        {
+            incrementar_iterador(local->pessoa_t, &id_destinatario);
+            if (aleat(0, 100) < mundo->pessoas[id_destinatario].extroversao)
+                if (insere_conjunto(mundo->pessoas[id_destinatario].rumores, rumor))
                     printf("(P%d/R%d) ", mundo->pessoas[id_destinatario].id_pessoa, rumor);
         }
     }
-    printf ("\n");
+    printf("\n");
 }
 
 void trata_evento_fim_simulacao(mundo_t *mundo, lef_t *lef)
 {
     /* Libera memória */
+    printf("Fim do mundo...");
+
     destroi_mundo(mundo);
     destroi_lef(lef);
 }
@@ -349,11 +360,13 @@ evento_t *cria_evento_chegada(int id_pessoa, int id_local, int tempo)
     chegada->id_local = id_local;
 
     evento->dados = chegada;
-    
+
     evento->tipo = CHEGADA;
     evento->tempo = tempo;
     evento->tamanho = sizeof(chegada_t);
-    evento->destroidados = (void*)destroi_evento_chegada;
+    evento->destroidados = (void *)destroi_evento_chegada;
+
+    printf("Adicionando evento de chegada na lef para pessoa %d no tempo %d em local %d.\n", id_pessoa, tempo, id_local);
 
     return evento;
 }
@@ -377,6 +390,8 @@ evento_t *cria_evento_partida(int id_pessoa, int id_local, int tempo)
     evento->tempo = tempo;
     evento->destroidados = (void *)destroi_evento_partida;
 
+    printf("Adicionando evento de partida na lef para pessoa %d no tempo %d em local %d.\n", id_pessoa, tempo, id_local);
+
     return evento;
 }
 
@@ -398,7 +413,9 @@ evento_t *cria_evento_disseminacao(int id_pessoa, int id_local, conjunto_t *cj_r
 
     evento->tipo = DISSEMINACAO;
     evento->tempo = tempo;
-    evento->destroidados =(void*) destroi_evento_disseminacao;
+    evento->destroidados = (void *)destroi_evento_disseminacao;
+
+    printf("Adicionando evento de disseminação na lef para pessoa %d no tempo %d em local %d.\n", id_pessoa, tempo, id_local);
 
     return evento;
 }
@@ -418,36 +435,44 @@ evento_t *cria_evento_fim_simulacao(int tempo)
     return evento;
 }
 
-
 /* Print e afins para evento */
 
-void saida_chegada (mundo_t *mundo, pessoa_t *pessoa, local_t *local, int caso) {
-    switch (caso) {
-        case 1: { /* caso de entrada */
-            printf ("%6d:CHEGA Pessoa %4d Local %2d (%2d/%2d), ENTRA\n", mundo->tempo_atual, pessoa->id_pessoa, local->id_local, cardinalidade (local->pessoa_t), local->capacidade);
-            break;
-        }
-        case 2: { /* caso de ida para fila */
-            printf ("%6d:CHEGA Pessoa %4d Local %2d (%2d/%2d), FILA %2d\n", mundo->tempo_atual, pessoa->id_pessoa, local->id_local, cardinalidade (local->pessoa_t), local->capacidade, tamanho_fila(local->fila_t));
-            break;
-        }
-        case 3: { /* caso de desistencia */
-            printf ("%6d:CHEGA Pessoa %4d Local %2d (%2d/%2d), DESISTE\n", mundo->tempo_atual, pessoa->id_pessoa, local->id_local, cardinalidade (local->pessoa_t), local->capacidade);
-            break;
-        }
+void saida_chegada(mundo_t *mundo, pessoa_t *pessoa, local_t *local, int caso)
+{
+    switch (caso)
+    {
+    case 1:
+    { /* caso de entrada */
+        printf("%6d:CHEGA Pessoa %4d Local %2d (%2d/%2d), ENTRA\n", mundo->tempo_atual, pessoa->id_pessoa, local->id_local, cardinalidade(local->pessoa_t), local->capacidade);
+        break;
+    }
+    case 2:
+    { /* caso de ida para fila */
+        printf("%6d:CHEGA Pessoa %4d Local %2d (%2d/%2d), FILA %2d\n", mundo->tempo_atual, pessoa->id_pessoa, local->id_local, cardinalidade(local->pessoa_t), local->capacidade, tamanho_fila(local->fila_t));
+        break;
+    }
+    case 3:
+    { /* caso de desistencia */
+        printf("%6d:CHEGA Pessoa %4d Local %2d (%2d/%2d), DESISTE\n", mundo->tempo_atual, pessoa->id_pessoa, local->id_local, cardinalidade(local->pessoa_t), local->capacidade);
+        break;
+    }
     }
 }
 
 /* trata a saida do evento de saida */
-void saida_saida (mundo_t *mundo, pessoa_t * pessoa_saida, int pessoa_fila, local_t *local, int caso) {
-    switch (caso) {
-        case 1: { /* caso de saida sem fila */
-            printf ("%6d:SAIDA Pessoa %4d Local %2d (%2d/%2d)\n", mundo->tempo_atual, pessoa_saida->id_pessoa, local->id_local, local->capacidade, local->capacidade);
-            break;
-        }
-        case 2: { /* caso de saida no espaço na fila */
-            printf ("%6d:SAIDA Pessoa %4d Local %2d (%2d/%2d), REMOVE FILA %2d\n", mundo->tempo_atual, pessoa_saida->id_pessoa, local->id_local, local->capacidade, local->capacidade, pessoa_fila);
-            break;
-        }
+void saida_saida(mundo_t *mundo, pessoa_t *pessoa_saida, int pessoa_fila, local_t *local, int caso)
+{
+    switch (caso)
+    {
+    case 1:
+    { /* caso de saida sem fila */
+        printf("%6d:SAIDA Pessoa %4d Local %2d (%2d/%2d)\n", mundo->tempo_atual, pessoa_saida->id_pessoa, local->id_local, local->capacidade, local->capacidade);
+        break;
+    }
+    case 2:
+    { /* caso de saida no espaço na fila */
+        printf("%6d:SAIDA Pessoa %4d Local %2d (%2d/%2d), REMOVE FILA %2d\n", mundo->tempo_atual, pessoa_saida->id_pessoa, local->id_local, local->capacidade, local->capacidade, pessoa_fila);
+        break;
+    }
     }
 }
