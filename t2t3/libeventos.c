@@ -131,6 +131,7 @@ void destroi_mundo(mundo_t *m)
         destroi_fila(m->locais[i].fila_t);
         destroi_conjunto(m->locais[i].pessoa_t);
     }
+
     free(m->pessoas);
     free(m->locais);
     free(m->rumores);
@@ -309,8 +310,9 @@ void trata_evento_fim_simulacao(mundo_t *mundo, lef_t *lef)
     /* Libera memória */
     printf("Fim do mundo...");
 
-    destroi_mundo(mundo);
+
     destroi_lef(lef);
+    destroi_mundo(mundo);
 }
 
 void destroi_evento_chegada(evento_t *evento)

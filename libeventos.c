@@ -145,7 +145,9 @@ void destroi_mundo(mundo_t *m)
 
 int local_cheio(local_t *local)
 {
-    return local->pessoa_t->card >= local->capacidade;
+    int cheio = local->pessoa_t->card >= local->capacidade;
+    
+    return cheio;
 }
 
 /*
@@ -209,6 +211,25 @@ void trata_evento_chegada(int id_pessoa, int id_local, mundo_t *mundo, lef_t *le
 
         insere_conjunto(local->pessoa_t, id_pessoa);
         saida_chegada(mundo, &mundo->pessoas[id_pessoa], local, 1);
+
+
+        /* Prepara Disseminação  */
+
+        /* Tamanho do conjunto de rumores */
+        int NRD = pessoa->extroversao/10;
+
+        /* Cria um subconjunto de rumores da pessoa */
+        conjunto_t *rumores = cria_subconjunto(pessoa->rumores, NRD);
+
+        /* Cria evento de disseminação */
+        evento_t *evento_disseminacao;
+        if (!(evento_disseminacao = cria_evento_disseminacao(id_pessoa, id_local, rumores, mundo->tempo_atual + aleat(0, tpl))))
+            return;
+
+        /* Insere na lef */
+        if (!(adiciona_ordem_lef(lef, evento_disseminacao)))
+            return;
+
     }
 }
 
@@ -281,17 +302,32 @@ void trata_evento_disseminacao(int id_pessoa, int id_local, conjunto_t *cj_rumor
     if (!(pessoa_origem = &mundo->pessoas[id_pessoa]))
         return;
 
+/*
+    printf("DEBUG: Tamanho conjunto de rumores da pessoa: %d\n", cj_rumores->card);
+    printf("DEBUG: Percorrendo \n");
+
+    iniciar_iterador(local->pessoa_t);
+    int i;
+    while (incrementar_iterador(cj_rumores, &i))
+    {
+        printf("DEBUG: Percorrendo %d\n", i);
+    }
+    
+    return;
+*/
+    
+
     int i_rumor, i_pessoa, rumor, id_destinatario;
     iniciar_iterador(local->pessoa_t);
 
     printf("%6d:RUMOR Pessoa %4d Local %2d ", mundo->tempo_atual, pessoa_origem->id_pessoa, local->id_local);
     /* Para cada pessoa no local  */
     iniciar_iterador(cj_rumores);
-    for (i_rumor = 0; i_rumor < cardinalidade(cj_rumores); i_rumor++)
+    for (i_rumor = 0; i_rumor < cj_rumores->card; i_rumor++)
     {
         incrementar_iterador(cj_rumores, &rumor);
         iniciar_iterador(local->pessoa_t);
-        for (i_pessoa = 0; i_pessoa < cardinalidade(local->pessoa_t); i_pessoa++)
+        for (i_pessoa = 0; i_pessoa < local->pessoa_t->card; i_pessoa++)
         {
             incrementar_iterador(local->pessoa_t, &id_destinatario);
             if (aleat(0, 100) < mundo->pessoas[id_destinatario].extroversao)
@@ -413,7 +449,6 @@ evento_t *cria_evento_disseminacao(int id_pessoa, int id_local, conjunto_t *cj_r
     evento->dados = disseminacao;
     evento->destroidados = (void *)destroi_evento_disseminacao;
 
-    printf("Adicionando evento de disseminação na lef para pessoa %d no tempo %d em local %d.\n", id_pessoa, tempo, id_local);
 
     return evento;
 }
@@ -441,17 +476,17 @@ void saida_chegada(mundo_t *mundo, pessoa_t *pessoa, local_t *local, int caso)
     {
     case 1:
     { /* caso de entrada */
-        printf("%6d:CHEGA Pessoa %4d Local %2d (%2d/%2d), ENTRA\n", mundo->tempo_atual, pessoa->id_pessoa, local->id_local, cardinalidade(local->pessoa_t), local->capacidade);
+        printf("%6d:CHEGA Pessoa %4d Local %2d (%2d/%2d), ENTRA\n", mundo->tempo_atual, pessoa->id_pessoa, local->id_local, local->pessoa_t->card, local->capacidade);
         break;
     }
     case 2:
     { /* caso de ida para fila */
-        printf("%6d:CHEGA Pessoa %4d Local %2d (%2d/%2d), FILA %2d\n", mundo->tempo_atual, pessoa->id_pessoa, local->id_local, cardinalidade(local->pessoa_t), local->capacidade, tamanho_fila(local->fila_t));
+        printf("%6d:CHEGA Pessoa %4d Local %2d (%2d/%2d), FILA %2d\n", mundo->tempo_atual, pessoa->id_pessoa, local->id_local, local->pessoa_t->card, local->capacidade, tamanho_fila(local->fila_t));
         break;
     }
     case 3:
     { /* caso de desistencia */
-        printf("%6d:CHEGA Pessoa %4d Local %2d (%2d/%2d), DESISTE\n", mundo->tempo_atual, pessoa->id_pessoa, local->id_local, cardinalidade(local->pessoa_t), local->capacidade);
+        printf("%6d:CHEGA Pessoa %4d Local %2d (%2d/%2d), DESISTE\n", mundo->tempo_atual, pessoa->id_pessoa, local->id_local, local->pessoa_t->card, local->capacidade);
         break;
     }
     }
@@ -464,12 +499,12 @@ void saida_saida(mundo_t *mundo, pessoa_t *pessoa_saida, int pessoa_fila, local_
     {
     case 1:
     { /* caso de saida sem fila */
-        printf("%6d:SAIDA Pessoa %4d Local %2d (%2d/%2d)\n", mundo->tempo_atual, pessoa_saida->id_pessoa, local->id_local, local->capacidade, local->capacidade);
+        printf("%6d:SAIDA Pessoa %4d Local %2d (%2d/%2d)\n", mundo->tempo_atual, pessoa_saida->id_pessoa, local->id_local, local->pessoa_t->card, local->capacidade);
         break;
     }
     case 2:
     { /* caso de saida no espaço na fila */
-        printf("%6d:SAIDA Pessoa %4d Local %2d (%2d/%2d), REMOVE FILA %2d\n", mundo->tempo_atual, pessoa_saida->id_pessoa, local->id_local, local->capacidade, local->capacidade, pessoa_fila);
+        printf("%6d:SAIDA Pessoa %4d Local %2d (%2d/%2d), REMOVE FILA %2d\n", mundo->tempo_atual, pessoa_saida->id_pessoa, local->id_local, local->pessoa_t->card, local->capacidade, pessoa_fila);
         break;
     }
     }
