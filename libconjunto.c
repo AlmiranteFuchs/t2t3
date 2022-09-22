@@ -63,12 +63,12 @@ int conjunto_vazio(conjunto_t *c) { return c->card == 0; }
 /*
  *  Retorna 1 se o conjunto esta cheio e 0 caso contrario.
  */
-int conjunto_cheio(conjunto_t *c) { return c->card == c->max; }
+int conjunto_cheio(conjunto_t *c) { return c->card -1 == c->max; }
 
 /*
  *  Retorna a cardinalidade do conjunto, isto eh, o numero de elementos presentes nele.
  */
-int cardinalidade(conjunto_t *c) { return c->card; }
+int cardinalidade(conjunto_t *c) { return c->card -1; }
 
 /*
  *  Insere o elemento no conjunto, garante que nao existam repeticoes.
@@ -423,6 +423,9 @@ int troca_elementos(int *v, int ind_x, int ind_a)
 int insere_ordenado(int *v, int final, int elemento)
 {
     v[final] = elemento;
+    if (&v[final] == &v[0])
+        return 0;
+
     if (v[final - 1] > elemento)
     {
         troca_elementos(v, final, final - 1);

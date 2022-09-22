@@ -148,7 +148,7 @@ int adiciona_ordem_lef(lef_t *l, evento_t *evento)
     {
         l->Primeiro = nodo;
     }
-
+    return 1;
 }
 
 /*

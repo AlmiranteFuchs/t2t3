@@ -8,7 +8,6 @@
 int main()
 {
     start_seed(); /* Inicializa SEED */
-   
 
     /* Cria uma lef pra guardar os eventos */
     lef_t *lef = cria_lef();
@@ -17,36 +16,50 @@ int main()
     if (!(evento_fim = cria_evento_fim_simulacao(34944)))
         return 0;
 
+    chegada_t *dados_chegada;   /* ponteiro que vai receber os dados de chegada */
+    saida_t *dados_saida;       /* ponteiro que vai receber os dados de saida */
+    disseminacao_t *dados_diss; /* ponteiro que vai receber os dados de disceminacao */
 
     /* Insere na lef */
     if (!(adiciona_inicio_lef(lef, evento_fim)))
         return 0;
 
-
-    mundo_t* mundo;
-    if (!(mundo = cria_mundo(20000, 30, 100, 8, lef)))
+    mundo_t *mundo;
+    if (!(mundo = cria_mundo(20000, 30, 2, 8, lef)))
         return 0;
-    
 
     evento_t *evento_atual;
     while ((evento_atual = obtem_primeiro_lef(lef)))
     {
-        printf("Novo evento");
-
         mundo->tempo_atual = evento_atual->tempo;
         switch (evento_atual->tipo)
         {
         case CHEGADA:
-            trata_evento_chegada(((chegada_t *)evento_atual->dados)->id_pessoa, ((chegada_t *)evento_atual->dados)->id_local, mundo, lef);
+        {
+            dados_chegada = (chegada_t *)evento_atual->dados;
+            trata_evento_chegada(dados_chegada->id_pessoa, dados_chegada->id_local, mundo, lef);
+            free(dados_chegada);
+            free(evento_atual);
             break;
+        }
 
         case PARTIDA:
-            trata_evento_partida(((saida_t *)evento_atual->dados)->id_pessoa, ((saida_t *)evento_atual->dados)->id_local, mundo, lef);
+        {
+            dados_saida = (saida_t *)evento_atual->dados;
+            trata_evento_partida(dados_saida->id_pessoa, dados_saida->id_local, mundo, lef);
+            free(dados_saida);
+            free(evento_atual);
             break;
-
+        }
         case DISSEMINACAO:
-            trata_evento_disseminacao(((disseminacao_t *)evento_atual->dados)->id_pessoa, ((disseminacao_t *)evento_atual->dados)->id_local, ((disseminacao_t *)evento_atual->dados)->rumores, mundo, lef);
+        {
+            dados_diss = (disseminacao_t *)evento_atual->dados;
+            trata_evento_disseminacao(dados_diss->id_pessoa, dados_diss->id_local, dados_diss->rumores, mundo, lef);
+            free(dados_diss);
+            free(evento_atual);
+            printf("DISS");
             break;
+        }
 
         case FIM_SIMULACAO:
             trata_evento_fim_simulacao(mundo, lef);
@@ -54,9 +67,9 @@ int main()
         }
 
         /* Da free no evento */
-        if (evento_atual->destroidados != NULL)
+        /* if (evento_atual->destroidados != NULL)
             evento_atual->destroidados(evento_atual->dados);
-        free(evento_atual);
+        free(evento_atual); */
     }
     return 1;
 }

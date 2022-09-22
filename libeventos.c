@@ -156,7 +156,6 @@ int local_cheio(local_t *local)
 
 void trata_evento_chegada(int id_pessoa, int id_local, mundo_t *mundo, lef_t *lef)
 {
-    printf("\nTRATANDO evento de CHEGADA na lef para pessoa %d no tempo %d em local %d.\n", id_pessoa, mundo->tempo_atual, id_local);
 
     /* Procura local */
     local_t *local;
@@ -215,7 +214,6 @@ void trata_evento_chegada(int id_pessoa, int id_local, mundo_t *mundo, lef_t *le
 
 void trata_evento_partida(int id_pessoa, int id_local, mundo_t *mundo, lef_t *lef)
 {
-    printf("\nTRATANDO evento de PARTIDA na lef para pessoa %d no tempo %d em local %d.\n", id_pessoa, mundo->tempo_atual, id_local);
 
     /* Procura local */
     local_t *local;
@@ -359,14 +357,13 @@ evento_t *cria_evento_chegada(int id_pessoa, int id_local, int tempo)
     chegada->id_pessoa = id_pessoa;
     chegada->id_local = id_local;
 
-    evento->dados = chegada;
 
     evento->tipo = CHEGADA;
     evento->tempo = tempo;
     evento->tamanho = sizeof(chegada_t);
+    evento->dados = chegada;
     evento->destroidados = (void *)destroi_evento_chegada;
 
-    printf("Adicionando evento de chegada na lef para pessoa %d no tempo %d em local %d.\n", id_pessoa, tempo, id_local);
 
     return evento;
 }
@@ -384,13 +381,13 @@ evento_t *cria_evento_partida(int id_pessoa, int id_local, int tempo)
     partida->id_pessoa = id_pessoa;
     partida->id_local = id_local;
 
-    evento->dados = partida;
 
     evento->tipo = PARTIDA;
     evento->tempo = tempo;
+    evento->tamanho = sizeof(saida_t);
+    evento->dados = partida;
     evento->destroidados = (void *)destroi_evento_partida;
 
-    printf("Adicionando evento de partida na lef para pessoa %d no tempo %d em local %d.\n", id_pessoa, tempo, id_local);
 
     return evento;
 }
@@ -409,10 +406,11 @@ evento_t *cria_evento_disseminacao(int id_pessoa, int id_local, conjunto_t *cj_r
     disseminacao->id_local = id_local;
     disseminacao->rumores = cj_rumores_pessoa;
 
-    evento->dados = disseminacao;
 
     evento->tipo = DISSEMINACAO;
     evento->tempo = tempo;
+    evento->tamanho = sizeof(disseminacao_t);
+    evento->dados = disseminacao;
     evento->destroidados = (void *)destroi_evento_disseminacao;
 
     printf("Adicionando evento de disseminação na lef para pessoa %d no tempo %d em local %d.\n", id_pessoa, tempo, id_local);
